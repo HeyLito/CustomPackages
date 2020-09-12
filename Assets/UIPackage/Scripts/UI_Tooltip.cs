@@ -38,7 +38,7 @@ namespace CustomUI
 
             obj.content = contentRect;
             obj.offsetFromPointer = new Vector2(0, 10);
-            var offsetProjection = new UI_Projection(obj.content, obj.transform.position + obj.OffsetPositionFromScreen(new Vector3(obj.offsetFromPointer.x, obj.offsetFromPointer.y)));
+            var offsetProjection = new UI_Projection(obj.content, obj.transform.position + UI_Utility.ConvertPositionToScreenConstant(new Vector3(obj.offsetFromPointer.x, obj.offsetFromPointer.y)));
             obj.content.transform.position = offsetProjection.WorldPosition;
         }
 
@@ -52,8 +52,8 @@ namespace CustomUI
             if (!Application.isPlaying)
                 contentDisplayPivot = DisplayPivot.IdleOnPivot;
 
-            UI_Projection projectionDebug = new UI_Projection(content, PositionFromDisplayPivot(contentDisplayPivot) + OffsetPositionFromScreen(offsetFromPointer), Bounds);
-            UI_Projection mirroredProjectionDebug = new UI_Projection(content, PositionFromDisplayPivot(contentDisplayPivot) + MirroredPositionWithConstraint(mirrorConstraint, projectionDebug, OffsetPositionFromScreen(offsetFromPointer)), Bounds);
+            UI_Projection projectionDebug = new UI_Projection(content, PositionFromDisplayPivot(contentDisplayPivot) + UI_Utility.ConvertPositionToScreenConstant(offsetFromPointer), Bounds);
+            UI_Projection mirroredProjectionDebug = new UI_Projection(content, PositionFromDisplayPivot(contentDisplayPivot) + MirroredPositionWithConstraint(mirrorConstraint, projectionDebug, UI_Utility.ConvertPositionToScreenConstant(offsetFromPointer)), Bounds);
 
             UI_Projection.DrawGizmosOutOfBounds(projectionDebug, Color.yellow, new Color(1f, 0.5f, 0f, 1));
             UI_Projection.DrawGizmosCorners(mirroredProjectionDebug.BoundedCorners, Color.blue);
@@ -90,7 +90,7 @@ namespace CustomUI
         private Vector2 _pointerPosOnRendered = new Vector2();
 
         public bool IsActive { get; private set; } = false;
-        public Vector2[] Bounds => UI_Constraint.GetBounds(contentConstraint, _rect, otherConstraint);
+        public Vector2[] Bounds => UI_Constraint.GetConstraintBounds(contentConstraint, _rect, otherConstraint);
         private Vector2 ContentPosition => PositionFromDisplayPivot(displayPivot);
         #endregion
 
@@ -203,8 +203,8 @@ namespace CustomUI
 
         private void MoveTooltip(Vector2 position)
         {
-            Vector2 normalPos = position + OffsetPositionFromScreen(offsetFromPointer);
-            Vector2 mirrorPos = position + MirroredPositionWithConstraint(mirrorConstraint, _mainProjection, OffsetPositionFromScreen(offsetFromPointer));
+            Vector2 normalPos = position + UI_Utility.ConvertPositionToScreenConstant(offsetFromPointer);
+            Vector2 mirrorPos = position + MirroredPositionWithConstraint(mirrorConstraint, _mainProjection, UI_Utility.ConvertPositionToScreenConstant(offsetFromPointer));
 
             _mainProjection.MoveBoundedProjection(normalPos, Bounds);
             _mirroredProjection.MoveBoundedProjection(mirrorPos, Bounds);
@@ -293,17 +293,6 @@ namespace CustomUI
                         return true;
                     return false;
             }
-        }
-
-        public Vector2 OffsetPositionFromScreen(Vector2 position)
-        {
-            Vector2 constantBounds = new Vector2(Screen.currentResolution.width / 180, Screen.currentResolution.height / 180);
-            return new Vector2(position.x * constantBounds.x, position.y * constantBounds.y);
-        }
-        public Vector3 OffsetPositionFromScreen(Vector3 position)
-        {
-            Vector2 constantBounds = new Vector2(Screen.currentResolution.width / 180, Screen.currentResolution.height / 180);
-            return new Vector2(position.x * constantBounds.x, position.y * constantBounds.y);
         }
         #endregion
     }

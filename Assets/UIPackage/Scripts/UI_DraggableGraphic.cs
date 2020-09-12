@@ -114,7 +114,7 @@ namespace CustomUI
         /// </summary>
         public UnityEvent onDragEnd = new UnityEvent();
 
-        public Vector2[] Bounds => UI_Constraint.GetBounds(dragConstraint, _rect, otherConstraint);
+        public Vector2[] Bounds => UI_Constraint.GetConstraintBounds(dragConstraint, _rect, otherConstraint);
         #endregion
 
         #region Methods
